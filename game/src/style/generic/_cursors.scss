@@ -1,0 +1,29 @@
+html {
+  cursor: default;
+}
+
+abbr[title],
+dfn[title] {
+  cursor: help;
+}
+
+button,
+input[type="button"],
+input[type="checkbox"],
+input[type="radio"],
+input[type="reset"],
+input[type="submit"],
+label[for],
+select {
+  cursor: pointer;
+}
+
+code {
+  cursor: text;
+}
+
+button[disabled],
+input[disabled],
+select[disabled] {
+  cursor: default;
+}

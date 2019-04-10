@@ -1,0 +1,22 @@
+$devices: (
+  phone: (
+    min-width: 320px,
+    max-width: 599px
+  ),
+  tablet7: (
+    min-width: 600px,
+    max-width: 767px
+  ),
+  tablet: (
+    min-width: 768px,
+    max-width: 1024px
+  ),
+  laptop: (
+    min-width: 1025px,
+    max-width: 1366px
+  ),
+  desktop: (
+    min-width: 1367px,
+    max-width: 1600px
+  )
+);

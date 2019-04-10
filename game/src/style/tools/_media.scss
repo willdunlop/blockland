@@ -1,0 +1,183 @@
+@mixin media($arg) {
+
+  // From 'device'
+  @if nth($arg, 1) == "from" and length($arg) == 2 {
+    // Is 'device' string or number?
+    @if type-of(nth($arg, 2)) == string {
+      // String. Is 'device' first in `$devices` map?
+      @if index(map-keys($devices), nth($arg, 2)) == 1 {
+        // Yes. No media query applied
+        @content;
+      } @else {
+        // No. Apply media query
+        @media screen and (min-width: px-em(map-reach($devices, nth($arg, 2), min-width))) {
+          @content;
+        }
+      }
+    } @else if type-of(nth($arg, 2)) == number {
+      // Number. Apply media query
+      @media screen and (min-width: px-em(nth($arg, 2))) {
+        @content;
+      }
+    } @else {
+      // Neither. Throw error
+      @error "Invalid type `#{type-of(nth($arg, 2))}`.";
+    }
+  }
+
+
+  // To 'device'
+  @else if nth($arg, 1) == "to" and length($arg) == 2 {
+    // Is 'device' string or number?
+    @if type-of(nth($arg, 2)) == string {
+      // String. Is 'device' last in `$devices` map?
+      @if index(map-keys($devices), nth($arg, 2)) == length(map-keys($devices)) {
+        // Yes. No media query applied
+        @content;
+      } @else {
+        // No. Apply media query
+        @media screen and (max-width: px-em(map-reach($devices, nth($arg, 2), max-width))) {
+          @content;
+        }
+      }
+    } @else if type-of(nth($arg, 2)) == number {
+      // Number. Apply media query
+      @media screen and (max-width: px-em(nth($arg, 2))) {
+        @content;
+      }
+    } @else {
+      // Neither. Throw error
+      @error "Invalid type `#{type-of(nth($arg, 2))}`.";
+    }
+  }
+
+
+  // A 'device'
+  @else if map-has-key($devices, $arg) and length($arg) == 1 {
+    // Is 'device' first or last in `$devices` map?
+    @if index(map-keys($devices), $arg) == 1 {
+      // First. Apply media query without `min-width`
+      @media screen and (max-width: px-em(map-reach($devices, $arg, max-width))) {
+        @content;
+      }
+    } @else if index(map-keys($devices), $arg) == length(map-keys($devices)) {
+      // Last. Apply media query without `max-width`
+      @media screen and (min-width: px-em(map-reach($devices, $arg, min-width))) {
+        @content;
+      }
+    } @else {
+      // Neither. Apply media query
+      @media screen and (min-width: px-em(map-reach($devices, $arg, min-width))) and (max-width: px-em(map-reach($devices, $arg, max-width))) {
+        @content;
+      }
+    }
+  }
+
+
+  // 'Device' to 'device'
+  @else if nth($arg, 2) == "to" and length($arg) == 3 {
+
+    // String to string
+    @if type-of(nth($arg, 1)) == string and type-of(nth($arg, 3)) == string {
+      // Is 'from device' value smaller than 'to device' value?
+      @if map-reach($devices, nth($arg, 1), min-width) < map-reach($devices, nth($arg, 3), max-width) {
+        // Yes. Is 'from device' first and/or 'to device' last in `$devices` map?
+        @if index(map-keys($devices), nth($arg, 1)) == 1 and index(map-keys($devices), nth($arg, 3)) == length(map-keys($devices)) {
+          // 'From device' is first and 'to device' is last. No media query applied
+          @content;
+        } @else if index(map-keys($devices), nth($arg, 1)) == 1 {
+          // 'From device' is first. Apply media query without `min-width`
+          @media screen and (max-width: px-em(map-reach($devices, nth($arg, 3), max-width))) {
+            @content;
+          }
+        } @else if index(map-keys($devices), nth($arg, 3)) == length(map-keys($devices)) {
+          // 'To device' is last. Apply media query without `max-width`
+          @media screen and (min-width: px-em(map-reach($devices, nth($arg, 1), min-width))) {
+            @content;
+          }
+        } @else {
+          // Neither. Apply media query
+          @media screen and (min-width: px-em(map-reach($devices, nth($arg, 1), min-width))) and (max-width: px-em(map-reach($devices, nth($arg, 3), max-width))) {
+            @content;
+          }
+        }
+      } @else {
+        // No. Throw error
+        @error "Invalid declaration `#{nth($arg, 1)} to #{nth($arg, 3)}` (#{map-reach($devices, nth($arg, 1), min-width)} to #{map-reach($devices, nth($arg, 3), max-width)}).";
+      }
+    }
+
+
+    // Number to string
+    @else if type-of(nth($arg, 1)) == number and type-of(nth($arg, 3)) == string {
+      // Is 'from' value smaller than 'to device' value?
+      @if nth($arg, 1) < map-reach($devices, nth($arg, 3), max-width) {
+        // Yes. Is 'to device' last in `$devices` map?
+        @if index(map-keys($devices), nth($arg, 3)) == length(map-keys($devices)) {
+          // Yes. Apply media query without `max-width`
+          @media screen and (min-width: px-em(nth($arg, 1))) {
+            @content;
+          }
+        } @else {
+          // No. Apply media query
+          @media screen and (min-width: px-em(nth($arg, 1))) and (max-width: px-em(map-reach($devices, nth($arg, 3), max-width))) {
+            @content;
+          }
+        }
+      } @else {
+        // No. Throw error
+        @error "Invalid declaration `#{nth($arg, 1)} to #{nth($arg, 3)}` (#{nth($arg, 1)} to #{map-reach($devices, nth($arg, 3), max-width)}).";
+      }
+    }
+
+
+    // String to number
+    @else if type-of(nth($arg, 1)) == string and type-of(nth($arg, 3)) == number {
+      // Is 'from device' value smaller than 'to' value?
+      @if map-reach($devices, nth($arg, 1), min-width) < nth($arg, 3) {
+        // Yes. Is 'from device' first in `$devices` map?
+        @if index(map-keys($devices), nth($arg, 1)) == 1 {
+          // Yes. Apply media query without `min-width`
+          @media screen and (max-width: px-em(nth($arg, 3))) {
+            @content;
+          }
+        } @else {
+          // No. Apply media query
+          @media screen and (min-width: px-em(map-reach($devices, nth($arg, 1), min-width))) and (max-width: px-em(nth($arg, 3))) {
+            @content;
+          }
+        }
+      } @else {
+        // No. Throw error
+        @error "Invalid declaration `#{nth($arg, 1)} to #{nth($arg, 3)}` (#{map-reach($devices, nth($arg, 1), min-width)} to #{nth($arg, 3)}).";
+      }
+    }
+
+
+    // Number to number
+    @else if type-of(nth($arg, 1)) == number and type-of(nth($arg, 3)) == number {
+      // Is 'from' value smaller than 'to' value?
+      @if nth($arg, 1) < nth($arg, 3) {
+        // Yes. Apply media query
+        @media screen and (min-width: px-em(nth($arg, 1))) and (max-width: px-em(nth($arg, 3))) {
+          @content;
+        }
+      } @else {
+        // No. Throw error
+        @error "Invalid declaration `#{nth($arg, 1)} to #{nth($arg, 3)}`.";
+      }
+    }
+
+
+    // None of the above
+    @else {
+      @error "Invalid declaration `#{$arg}`.";
+    }
+  }
+
+
+  // None of the above
+  @else {
+    @error "Invalid declaration `#{$arg}`.";
+  }
+}

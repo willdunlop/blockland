@@ -1,0 +1,18 @@
+html {
+  @include responsive-type(font-size, 320px, 1366px, 14px, 18px);
+  color: $white;
+  font-family: 'Ubuntu', sans-serif;
+  height: 100%;
+  line-height: 1.375;
+
+  background: #ffdddd; /* Old browsers */
+  background: -moz-linear-gradient(top,  #ffdddd 0%, #8200c9 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top,  #ffdddd 0%,#8200c9 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom,  #ffdddd 0%,#8200c9 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffdddd', endColorstr='#8200c9',GradientType=0 ); /* IE6-9 */
+}
+
+body {
+  min-height: 100%;
+  overflow: hidden;
+}

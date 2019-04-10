@@ -1,0 +1,83 @@
+// Font Weights
+////////////////////////////////////////////////////////////////////////////////////////////
+// Regular normal
+// Medium 400
+// Bold bold
+// Black 900
+
+// Fonts
+////////////////////////////////////////////////////////////////////////////////////////////
+
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+
+@font-face {
+  font-family: Ubuntu;
+  font-style: normal;
+  font-weight: 400;
+  src: url('https://fonts.googleapis.com/css?family=Ubuntu');
+}
+
+
+// @font-face {
+//   font-family: ModernEra;
+//   font-style: normal;
+//   font-weight: 900;
+//   src: url("../fonts/modern-era/ModernEra-Black.woff2") format("woff2"),
+//        url("../fonts/modern-era/ModernEra-Black.woff") format("woff");
+// }
+//
+// @font-face {
+//   font-family: ModernEra;
+//   font-style: italic;
+//   font-weight: 900;
+//   src: url("../fonts/modern-era/ModernEra-BlackItalic.woff2") format("woff2"),
+//        url("../fonts/modern-era/ModernEra-BlackItalic.woff") format("woff");
+// }
+//
+// @font-face {
+//   font-family: ModernEra;
+//   font-style: normal;
+//   font-weight: bold;
+//   src: url("../fonts/modern-era/ModernEra-Bold.woff2") format("woff2"),
+//        url("../fonts/modern-era/ModernEra-Bold.woff") format("woff");
+// }
+//
+// @font-face {
+//   font-family: ModernEra;
+//   font-style: italic;
+//   font-weight: bold;
+//   src: url("../fonts/modern-era/ModernEra-BoldItalic.woff2") format("woff2"),
+//        url("../fonts/modern-era/ModernEra-BoldItalic.woff") format("woff");
+// }
+//
+// @font-face {
+//   font-family: ModernEra;
+//   font-style: normal;
+//   font-weight: normal;
+//   src: url("../fonts/modern-era/ModernEra-Regular.woff2") format("woff2"),
+//        url("../fonts/modern-era/ModernEra-Regular.woff") format("woff");
+// }
+//
+// @font-face {
+//   font-family: ModernEra;
+//   font-style: italic;
+//   font-weight: normal;
+//   src: url("../fonts/modern-era/ModernEra-Italic.woff2") format("woff2"),
+//        url("../fonts/modern-era/ModernEra-Italic.woff") format("woff");
+// }
+//
+// @font-face {
+//   font-family: ModernEra;
+//   font-style: normal;
+//   font-weight: 400;
+//   src: url("../fonts/modern-era/ModernEra-Medium.woff2") format("woff2"),
+//        url("../fonts/modern-era/ModernEra-Medium.woff") format("woff");
+// }
+//
+// @font-face {
+//   font-family: ModernEra;
+//   font-style: italic;
+//   font-weight: 400;
+//   src: url("../fonts/modern-era/ModernEra-MediumItalic.woff2") format("woff2"),
+//        url("../fonts/modern-era/ModernEra-MediumItalic.woff") format("woff");
+// }

@@ -1,0 +1,14 @@
+@mixin aspect-ratio($ratio: 16/9, $position: relative, $descendant: "*") {
+  display: block;
+  height: 0;
+  padding-top: percentage(1 / $ratio);
+  position: $position;
+
+  > #{$descendant} {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+}

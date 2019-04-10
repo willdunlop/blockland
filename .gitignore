@@ -1,0 +1,6 @@
+./node_modules
+node_modules
+game/node_modules
+
+./build
+game/build
