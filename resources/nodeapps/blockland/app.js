@@ -50,12 +50,19 @@ http.listen(2002, function(){
   console.log('listening on *:2002 - origin set');
 });
 
+/**
+ * This set interval will gather the data of all the connected sockets 
+ * and place them in an array whcih is sent to the client. It is set to do the every 40ms.
+ * Ideally, you would find a way to only package up data relative to the user, ie, only 
+ * package up socket activity that is occuring on the currently loaded tile. No need to 
+ * send the state of the entir game to the user when they can only see less than 1%
+ */
 setInterval(function(){
-	const nsp = io.of('/');
+	const namespace = io.of('/');
     let pack = [];
 	
     for(let id in io.sockets.sockets){
-        const socket = nsp.connected[id];
+        const socket = namespace.connected[id];
 		//Only push sockets that have been initialised
 		if (socket.userData.model!==undefined){
 			pack.push({
