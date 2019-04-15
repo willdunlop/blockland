@@ -29,7 +29,6 @@ class Game{
 	}
 	
 	init() {
-
 		this.camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 5000 );
 		this.camera.position.set(112, 100, 600);
         

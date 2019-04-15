@@ -1,10 +1,10 @@
-import TWEEN from '@tweenjs/tween.js';
 
 import initialise from './initialise';
 
 import constants from '../config/constants';
 import helpers from '../config/helpers';
 
+import PlayerLocal from './player/local';
 // import helpers from '../config/helpers';
 // const { controls } = helpers;
 
@@ -90,35 +90,36 @@ class Core {
 		grid.material.transparent = true;
 		this.scene.add( grid );
 
-        this.loaders.fbx.load('/assets/3D/FireFighter.fbx', object => {
-            object.mixer = new THREE.AnimationMixer(object);
-            this.player.mixer = object.mixer;
-            this.player.root = object.mixer.getRoot();
+        // this.loaders.fbx.load('/assets/3D/people/FireFighter.fbx', object => {
+        //     object.mixer = new THREE.AnimationMixer(object);
+        //     this.player.mixer = object.mixer;
+        //     this.player.root = object.mixer.getRoot();
 
-            object.name = "FireFighter";
+        //     object.name = "FireFighter";
             
-            this.loaders.texture.load('/assets/3D/SimplePeople_FireFighter_Brown.png', texture => {
-                object.traverse(child => {
-                    if(child.isMesh){
-                        child.material.map = texture;
-                        child.castShadow = true;
-                        child.recieveShadow = false;
-                    }
-                })
-            });
-            this.player.object = new THREE.Object3D();
-            this.scene.add(this.player.object)
-            this.player.object.add(object);
-            this.animations.Idle = object.animations[0];
+        //     this.loaders.texture.load('/assets/3D/SimplePeople_FireFighter_Brown.png', texture => {
+        //         object.traverse(child => {
+        //             if(child.isMesh){
+        //                 child.material.map = texture;
+        //                 child.castShadow = true;
+        //                 child.recieveShadow = false;
+        //             }
+        //         })
+        //     });
+        //     this.player.object = new THREE.Object3D();
+        //     this.scene.add(this.player.object)
+        //     this.player.object.add(object);
+        //     this.animations.Idle = object.animations[0];
 
-            helpers.loadNextAnim(this.animations, this.loaders.fbx);
-            initialise.createCameras(this);
-            initialise.createColliders(this);
+        //     helpers.loadNextAnim(this.animations, this.loaders.fbx);
+        //     initialise.createCameras(this);
+        //     initialise.createColliders(this);
 
-            this.joystick = new JoyStick({ onMove: (forward, turn) => helpers.playerControl(this, forward, turn), game: this })
-            this.action = "Idle"; /** this.action is using a setter/getter */
-        })
+        //     this.joystick = new JoyStick({ onMove: (forward, turn) => helpers.playerControl(this, forward, turn), game: this })
+        //     this.action = "Idle"; /** this.action is using a setter/getter */
+        // })
 
+        this.player = new PlayerLocal(this);
 
         /** Add all lights, meshes and shaders to the scene */
         this.scene.add(this.sun);
@@ -163,7 +164,6 @@ class Core {
         this.renderer.setAnimationLoop(this.animate.bind(this));
         this.update(dt);
         this.render(timestamp);
-
     }
 
     update(dt) {
