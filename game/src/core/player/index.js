@@ -1,4 +1,5 @@
 import constants from '../../config/constants';
+import helpers from '../../config/helpers';
 import initialise from '../initialise';
 
 class Player {
@@ -42,6 +43,7 @@ class Player {
             this.mixer = object.mixer;
             object.name = "Person";
 
+
             textureLoader.load(`assets/3D/images/SimplePeople_${this.model}_${this.colour}.png`, texture => {
                 object.traverse(child => {
                     if(child.isMesh) {
@@ -54,6 +56,10 @@ class Player {
 
             this.object = new THREE.Object3D();
             this.object.add(object);
+            this.object.position.x = helpers.getRandomNumber(6800, 9800);
+            this.object.position.z = helpers.getRandomNumber(-900, -150);
+            this.object.rotation.y = -(Math.PI / 2)
+
             if(this.deleted === undefined) this.core.scene.add(this.object);
 
             if (this.local) {
@@ -62,6 +68,7 @@ class Player {
                 this.core.animations.Idle = object.animations[0];
                 if(this.initSocket !== undefined) this.initSocket();
             } else {
+                console.log("Creating non local player")
 				const geometry = new THREE.BoxGeometry(100,300,100);
 				const material = new THREE.MeshBasicMaterial({visible:false});
 				const box = new THREE.Mesh(geometry, material);

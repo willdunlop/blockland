@@ -5,6 +5,7 @@ import constants from '../config/constants';
 import helpers from '../config/helpers';
 
 import PlayerLocal from './player/local';
+import Player from './player';
 // import helpers from '../config/helpers';
 // const { controls } = helpers;
 
@@ -29,6 +30,13 @@ class Core {
         this.colliders = [];
         this.sun = initialise.configureLight();
         this.clock = new THREE.Clock();
+
+        this.remotePlayers = [];
+		this.remoteColliders = [];
+		this.initialisingPlayers = [];
+		this.remoteData = [];
+
+
         this.loaders = {
             fbx: new THREE.FBXLoader(),
             texture: new THREE.TextureLoader()
@@ -63,8 +71,8 @@ class Core {
         container.appendChild(this.stats.dom);
         // this.camera.lookAt(devCtarget);
 
-        this.scene.background = new THREE.Color(0xa0a0a0);
-        this.scene.fog = new THREE.Fog(0xa0a0a0, 700, 1800);
+        // this.scene.background = new THREE.Color(0xa0a0a0);
+        // this.scene.fog = new THREE.Fog(0xa0a0a0, 2000, 2500);
 
 
         /** Set up lights to be used in the scene */
@@ -78,81 +86,119 @@ class Core {
         // var helper = new THREE.HemisphereLightHelper( hemiLight, 5, 0x000000);
         // this.scene.add( helper );
 
-        const groundGeo = new THREE.PlaneBufferGeometry(4000, 4000);
-        const groundMat = new THREE.MeshPhongMaterial({ color: 0x999999, depthWrite: false })
-        const ground = new THREE.Mesh(groundGeo, groundMat);
-        ground.name = 'ground';
-        ground.rotation.x = - Math.PI * 0.5;
-        ground.receiveShadow = true;
-        this.colliders.push(ground)
+        // const groundGeo = new THREE.PlaneBufferGeometry(4000, 4000);
+        // const groundMat = new THREE.MeshPhongMaterial({ color: 0x999999, depthWrite: false })
+        // const ground = new THREE.Mesh(groundGeo, groundMat);
+        // ground.name = 'ground';
+        // ground.rotation.x = - Math.PI * 0.5;
+        // ground.receiveShadow = true;
+        // this.colliders.push(ground)
 
-        const grid = new THREE.GridHelper( 4000, 60, 0x000000, 0x000000 );
-		grid.material.opacity = 0.2;
-		grid.material.transparent = true;
-		this.scene.add( grid );
+        // const grid = new THREE.GridHelper( 4000, 60, 0x000000, 0x000000 );
+		// grid.material.opacity = 0.2;
+		// grid.material.transparent = true;
+		// this.scene.add( grid );
 
-        // this.loaders.fbx.load('/assets/3D/people/FireFighter.fbx', object => {
-        //     object.mixer = new THREE.AnimationMixer(object);
-        //     this.player.mixer = object.mixer;
-        //     this.player.root = object.mixer.getRoot();
-
-        //     object.name = "FireFighter";
-            
-        //     this.loaders.texture.load('/assets/3D/SimplePeople_FireFighter_Brown.png', texture => {
-        //         object.traverse(child => {
-        //             if(child.isMesh){
-        //                 child.material.map = texture;
-        //                 child.castShadow = true;
-        //                 child.recieveShadow = false;
-        //             }
-        //         })
-        //     });
-        //     this.player.object = new THREE.Object3D();
-        //     this.scene.add(this.player.object)
-        //     this.player.object.add(object);
-        //     this.animations.Idle = object.animations[0];
-
-        //     helpers.loadNextAnim(this.animations, this.loaders.fbx);
-        //     initialise.createCameras(this);
-        //     initialise.createColliders(this);
-
-        //     this.joystick = new JoyStick({ onMove: (forward, turn) => helpers.playerControl(this, forward, turn), game: this })
-        //     this.action = "Idle"; /** this.action is using a setter/getter */
-        // })
 
         this.player = new PlayerLocal(this);
         helpers.loadNextAnim(this.animations, this.loaders.fbx)
-        initialise.createColliders(this);
+        this.loadEnvironment();
+        // initialise.createColliders(this);
         this.joystick = new JoyStick({ onMove: (forward, turn) => helpers.playerControl(this, forward, turn), game: this })
 
         /** Add all lights, meshes and shaders to the scene */
         this.scene.add(this.sun);
         this.scene.add(hemiLight);
-        this.scene.add(ground);
+        // this.scene.add(ground);
 
 
         /** Add event listeners for screen resizing */
         window.addEventListener('resize', this.onWindowResize.bind(this), false);
     }
 
-    /** Setters and Getters */
-    // set action(name) { 
-    //     console.log("setting action")
-    //     const action = this.player.mixer.clipAction(this.animations[name]);
-    //     action.time = 0;
-    //     this.player.mixer.stopAllAction();
-    //     this.player.action = name;
-    //     this.player.actionTime = Date.now();
-    //     this.player.actionName = name;
 
-    //     action.fadeIn(0.5);
-    //     action.play();
-    // }
+    loadEnvironment() {
+        this.loaders.fbx.load('/assets/3D/town.fbx', object => {
+            this.environment = object;
+            this.scene.add(object);
+            object.traverse(child => {
+                if(child.isMesh) {
+                    if (child.name.startsWith("proxy")) {
+                        this.colliders.push(child);
+                        child.material.visible = false;
+                    } else {
+                        child.castShadow = true;
+                        child.recieveShadow = true;
+                    }
+                }
+            })
 
-    // get action() {
-    //     if (this.player == undefined || this.player.actionName == undefined) return;
-    //     return this.player.actionName
-    // }
+        }, undefined, err => { console.log("Error loading town", err)})
+    }
+
+    /**
+     * It would bring me joy if you would return to this function and chill it out in a number of ways
+     */
+    updateRemotePlayers(delta) {
+        if(
+            this.remoteData === undefined ||
+            this.remoteData.length === 0 ||
+            this.player === undefined ||
+            this.player.id === undefined
+        ) return;
+
+        const remotePlayers = [];
+        const remoteColliders = [];
+
+        this.remoteData.forEach(data => {
+            // Ignores local player
+            if (this.player.id !== data.id) {
+                // Check if it is an initialising player
+                let iplayer;
+                this.initialisingPlayers.forEach(player => {
+                    if (player.id === data.id) iplayer = player
+                });
+
+                if (iplayer === undefined) {
+                    let rplayer;
+                    this.remotePlayers.forEach(player => {
+                        if (player.id === data.id) rplayer = player;
+                    });
+                    if (rplayer === undefined) {
+                        this.initialisingPlayers.push( new Player(this, data));
+                    } else {
+                        remotePlayers.push(rplayer);
+                        this.remoteColliders.push(rplayer.collider)
+                    }
+                }
+            }
+        });
+
+        /** Delete players if they disconnect */
+        /** I do not like this grossly broad loop of scene */
+        this.scene.children.forEach(object => {
+            if(object.userData.remotePlayer && this.getRemotePlayerById(object.userData.id) === undefined) {
+                this.scene.remove(object);
+            }
+        });
+
+        this.remotePlayers = remotePlayers;
+        this.remoteCollider = remoteColliders;
+        this.remotePlayers.forEach(player => { player.update(delta); });
+    }
+
+    getRemotePlayerById(id) {
+        if(this.remotePlayers === undefined || this.remotePlayers.length === 0) return;
+
+        const players = this.remotePlayers.filter(player => {
+            if(player.id == id) return true;
+        });
+
+        if (players.length === 0) return;
+
+        return players[0];
+    }
+
 
     set activeCamera(object) { this.player.cameras.active = object }
 
@@ -174,6 +220,8 @@ class Core {
         /** FPS counter */
         this.stats.update();
         /* Put a check to make sure all the async shit has completed */
+
+        this.updateRemotePlayers(dt);
 
         if (this.player.mixer !== undefined) this.player.mixer.update(dt);
 

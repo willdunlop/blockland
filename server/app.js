@@ -49,10 +49,18 @@ io.sockets.on('connection', socket => {
 });
 
 http.listen(2002,() => {
-    console.log("\x1b[31m$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\x1b[0m");
-    console.log("\x1b[31m$$$ Server Running on port 2002 $$$\x1b[0m");
-    console.log("\x1b[31m$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\x1b[0m")
+    console.log("\x1b[32m$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\x1b[0m");
+    console.log("\x1b[32m$$$ Server Running on port 2002 $$$\x1b[0m");
+    console.log("\x1b[32m$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\x1b[0m")
 })
+
+/**
+ * This set interval will gather the data of all the connected sockets 
+ * and place them in an array whcih is sent to the client. It is set to do the every 40ms.
+ * Ideally, you would find a way to only package up data relative to the user, ie, only 
+ * package up socket activity that is occuring on the currently loaded tile. No need to 
+ * send the state of the entir game to the user when they can only see less than 1%
+ */
 
 setInterval(() => {
     const nsp = io.of('/');
@@ -60,21 +68,21 @@ setInterval(() => {
 
     for (let id in io.sockets.sockets) {
         const socket = nsp.connected[id];
-
+        // console.log("socket", socket.userData.model)
         if(socket.userData.model !== undefined) {
             pack.push({
                 id: socket.id,
-                model: socket.uderData.model,
-                colour: socket.uderData.colour,
-                x: socket.uderData.x,
-                y: socket.uderData.y,
-                z: socket.uderData.z,
-                heading: socket.uderData.heading,
-                pb: socket.uderData.pb,
-                action: socket.uderData.action
+                model: socket.userData.model,
+                colour: socket.userData.colour,
+                x: socket.userData.x,
+                y: socket.userData.y,
+                z: socket.userData.z,
+                heading: socket.userData.heading,
+                pb: socket.userData.pb,
+                action: socket.userData.action
             });
         }
     }
-
+    // console.log("pack", pack)
     if(pack.length > 0) io.emit('remoteData', pack);
 }, 40);

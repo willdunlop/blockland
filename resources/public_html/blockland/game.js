@@ -309,7 +309,12 @@ class Game{
 	 * ***** remotePlayers
 	 **************************************************************/
 	updateRemotePlayers(dt){
-		if (this.remoteData===undefined || this.remoteData.length == 0 || this.player===undefined || this.player.id===undefined) return;
+		if (
+			this.remoteData===undefined || 
+			this.remoteData.length == 0 || 
+			this.player===undefined || 
+			this.player.id===undefined
+		) return;
 		
 		const newPlayers = [];
 		const game = this;

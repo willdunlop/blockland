@@ -4,11 +4,12 @@ import Player from './index';
 class PlayerLocal extends Player {
     constructor(core, model) {
         super(core, model);
-        console.log("PlayerLocal", this);
 
         const socket = io.connect("http://localhost:2002");
         socket.on('setId', data => { this.id = data.id; })
-        socket.on('remotePlayer', data => { core.remoteData = data; })
+        socket.on('remoteData', data => { 
+            core.remoteData = data; 
+        })
         socket.on('deletePlayer', data => {
             const players = core.remotePlayers.filter(player => {
                 if (player.id === data.id) return player;
@@ -21,7 +22,7 @@ class PlayerLocal extends Player {
                     core.scene.remove(players[0].object);
                 }
             } else {
-                index = core.initialisingPlayers.indexOf(data.id);
+                let index = core.initialisingPlayers.indexOf(data.id);
                 if(index !== -1) {
                     const player = core.initialisingPlayers[index];
                     player.deleted = true;
@@ -45,18 +46,17 @@ class PlayerLocal extends Player {
          this.socket = socket;
     }
 
-    initSocket() {
-        if (this.socket !== undefined) {
-            this.socket.emit('update', {
-                x: this.object.position.x,
-                y: this.object.position.y,
-                z: this.object.position.z,
-                h: this.object.rotation.y,
-                pb: this.object.rotation.x,
-                action: this.action
-            })
-        }
-    }
+	initSocket(){
+		this.socket.emit('init', { 
+			model:this.model, 
+			colour: this.colour,
+			x: this.object.position.x,
+			y: this.object.position.y,
+			z: this.object.position.z,
+			h: this.object.rotation.y,
+			pb: this.object.rotation.x
+		});
+	}
 
     updateSocket(){
 		if (this.socket !== undefined){
