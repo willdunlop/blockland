@@ -1,7 +1,7 @@
 
 const constants = { 
 
-    animationList: ["Walking", "Walking_Backwards", "Turn", "Running"],
+    animationList: ["Walking", "Walking_Backward", "Turn", "Running"],
 
     playerCameras: {
         front: { x: 112, y: 100, z: 600 },

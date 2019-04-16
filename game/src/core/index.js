@@ -84,6 +84,7 @@ class Core {
         ground.name = 'ground';
         ground.rotation.x = - Math.PI * 0.5;
         ground.receiveShadow = true;
+        this.colliders.push(ground)
 
         const grid = new THREE.GridHelper( 4000, 60, 0x000000, 0x000000 );
 		grid.material.opacity = 0.2;
@@ -120,6 +121,9 @@ class Core {
         // })
 
         this.player = new PlayerLocal(this);
+        helpers.loadNextAnim(this.animations, this.loaders.fbx)
+        initialise.createColliders(this);
+        this.joystick = new JoyStick({ onMove: (forward, turn) => helpers.playerControl(this, forward, turn), game: this })
 
         /** Add all lights, meshes and shaders to the scene */
         this.scene.add(this.sun);
@@ -132,23 +136,23 @@ class Core {
     }
 
     /** Setters and Getters */
-    set action(name) { 
-        console.log("setting action")
-        const action = this.player.mixer.clipAction(this.animations[name]);
-        action.time = 0;
-        this.player.mixer.stopAllAction();
-        this.player.action = name;
-        this.player.actionTime = Date.now();
-        this.player.actionName = name;
+    // set action(name) { 
+    //     console.log("setting action")
+    //     const action = this.player.mixer.clipAction(this.animations[name]);
+    //     action.time = 0;
+    //     this.player.mixer.stopAllAction();
+    //     this.player.action = name;
+    //     this.player.actionTime = Date.now();
+    //     this.player.actionName = name;
 
-        action.fadeIn(0.5);
-        action.play();
-    }
+    //     action.fadeIn(0.5);
+    //     action.play();
+    // }
 
-    get action() {
-        if (this.player == undefined || this.player.actionName == undefined) return;
-        return this.player.actionName
-    }
+    // get action() {
+    //     if (this.player == undefined || this.player.actionName == undefined) return;
+    //     return this.player.actionName
+    // }
 
     set activeCamera(object) { this.player.cameras.active = object }
 
@@ -176,9 +180,11 @@ class Core {
         /* Player Controls Update */
         if (this.player.action === 'Walking') {
             const elapsedTime = Date.now() - this.player.actionTime;
-            if (elapsedTime > 1000 && this.player.move.forward > 0) this.action = 'Running'
+            if (elapsedTime > 1000 && this.player.motion.forward > 0) this.player.action = 'Running'
         }
-        if (this.player.move !== undefined) helpers.movePlayer(this, dt);
+        // if (this.player.move !== undefined) helpers.movePlayer(this, dt);
+        if (this.player.motion !== undefined) this.player.move(dt);
+
 
         /* Player Camera Update */
         if (this.player.cameras !== undefined && this.player.cameras.active !== undefined) {

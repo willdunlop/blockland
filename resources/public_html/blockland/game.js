@@ -1,4 +1,8 @@
 class Game{
+
+	/*************************************************************** 
+	 * ***** CONSTRUCTOR
+	 **************************************************************/
 	constructor(){
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -71,6 +75,10 @@ class Game{
 		}
 	}
 	
+	/*************************************************************** 
+	 * ***** initSFX
+	 **************************************************************/
+
 	initSfx(){
 		this.sfx = {};
 		this.sfx.context = new (window.AudioContext || window.webkitAudioContext)();
@@ -82,10 +90,16 @@ class Game{
 		});
 	}
 	
+	/*************************************************************** 
+	 * ***** activeCamera setter
+	 **************************************************************/
 	set activeCamera(object){
 		this.cameras.active = object;
 	}
 	
+	/*************************************************************** 
+	 * ***** game init
+	 **************************************************************/
 	init() {
 		this.mode = this.modes.INITIALISING;
 
@@ -147,6 +161,9 @@ class Game{
 		window.addEventListener( 'resize', () => game.onWindowResize(), false );
 	}
 	
+	/*************************************************************** 
+	 * ***** Environment loader
+	 **************************************************************/
 	loadEnvironment(loader){
 		const game = this;
 		loader.load(`${this.assetsPath}fbx/town.fbx`, function(object){
@@ -180,6 +197,9 @@ class Game{
 		})
 	}
 
+	/*************************************************************** 
+	 * ***** anim loader
+	 **************************************************************/
 	loadNextAnim(loader){
 		let anim = this.anims.pop();
 		const game = this;
@@ -196,6 +216,9 @@ class Game{
 		});	
 	}
 	
+	/*************************************************************** 
+	 * ***** player control
+	 **************************************************************/
 	playerControl(forward, turn){
 		turn = -turn;
 		
@@ -221,6 +244,9 @@ class Game{
 		this.player.updateSocket();
 	}
 	
+	/*************************************************************** 
+	 * ***** camera creator
+	 **************************************************************/
 	createCameras(){
 		const offset = new THREE.Vector3(0, 80, 0);
 		const front = new THREE.Object3D();
@@ -245,6 +271,9 @@ class Game{
 		this.activeCamera = this.cameras.back;	
 	}
 	
+	/*************************************************************** 
+	 * ***** showmessage
+	 **************************************************************/
 	showMessage(msg, fontSize=20, onOK=null){
 		const txt = document.getElementById('message_text');
 		txt.innerHTML = msg;
@@ -265,6 +294,9 @@ class Game{
 		panel.style.display = 'flex';
 	}
 	
+	/*************************************************************** 
+	 * ***** window resize
+	 **************************************************************/
 	onWindowResize() {
 		this.camera.aspect = window.innerWidth / window.innerHeight;
 		this.camera.updateProjectionMatrix();
@@ -273,6 +305,9 @@ class Game{
 
 	}
 	
+	/*************************************************************** 
+	 * ***** remotePlayers
+	 **************************************************************/
 	updateRemotePlayers(dt){
 		if (this.remoteData===undefined || this.remoteData.length == 0 || this.player===undefined || this.player.id===undefined) return;
 		
@@ -318,6 +353,9 @@ class Game{
 		this.remotePlayers.forEach(function(player){ player.update( dt ); });	
 	}
 	
+	/*************************************************************** 
+	 * ***** mousedown
+	 **************************************************************/
 	onMouseDown( event ) {
 		if (this.remoteColliders===undefined || this.remoteColliders.length==0 || this.speechBubble===undefined || this.speechBubble.mesh===undefined) return;
 		
@@ -365,6 +403,9 @@ class Game{
 		}
 	}
 	
+	/*************************************************************** 
+	 * ***** get remote players
+	 **************************************************************/
 	getRemotePlayerById(id){
 		if (this.remotePlayers===undefined || this.remotePlayers.length==0) return;
 		
@@ -377,6 +418,9 @@ class Game{
 		return players[0];
 	}
 	
+	/*************************************************************** 
+	 * ***** animate
+	 **************************************************************/
 	animate() {
 		const game = this;
 		const dt = this.clock.getDelta();
@@ -417,6 +461,31 @@ class Game{
 		this.renderer.render( this.scene, this.camera );
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * *************************************************************
+ * ************************************************************* 
+ * ***** PLAYER
+ * *************************************************************
+ * ************************************************************* 
+ */
+
 
 class Player{
 	constructor(game, options){
@@ -538,6 +607,30 @@ class Player{
 		}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * *************************************************************
+ * ************************************************************* 
+ * ***** PLAYER LOCAL
+ * *************************************************************
+ * ************************************************************* 
+ */
+
 
 class PlayerLocal extends Player{
 	constructor(game, model){
@@ -698,6 +791,23 @@ class PlayerLocal extends Player{
 		this.updateSocket();
 	}
 }
+
+
+
+
+
+
+
+
+
+
+/**
+ * *************************************************************
+ * ************************************************************* 
+ * ***** SPEECH BUBBLE
+ * *************************************************************
+ * ************************************************************* 
+ */
 
 class SpeechBubble{
 	constructor(game, msg, size=1){

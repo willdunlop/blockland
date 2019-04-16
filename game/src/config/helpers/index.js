@@ -14,22 +14,21 @@ const helpers = {
 
     playerControl(core, forward, turn) {
         turn = -turn;
-
 		if (forward>0.3){
-			if (core.player.action!='Walking' && core.player.action!='Running') core.action = 'Walking';
+			if (core.player.action != 'Walking' && core.player.action != 'Running') core.player.action = 'Walking';
 		}else if (forward < -0.3){
-			if (core.player.action!='Walking_Backwards') core.action = 'Walking_Backwards';
+			if (core.player.action!='Walking_Backward') core.player.action = 'Walking_Backward';
 		}else{
 			forward = 0;
 			if (Math.abs(turn)>0.1){
-				if (core.player.action != 'Turn') core.action = 'Turn';
+				if (core.player.action != 'Turn') core.player.action = 'Turn';
 			}else if (core.player.action != "Idle"){
-				core.action = 'Idle';
+				core.player.action = 'Idle';
 			}
         }
         
-        if (forward==0 && turn==0) delete core.player.move;
-		else core.player.move = { forward, turn }; 
+        if (forward==0 && turn==0) delete core.player.motion;
+		else core.player.motion = { forward, turn }; 
     },
 
 

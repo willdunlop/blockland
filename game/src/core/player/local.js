@@ -1,8 +1,10 @@
+import io from 'socket.io-client';
 import Player from './index';
 
 class PlayerLocal extends Player {
     constructor(core, model) {
         super(core, model);
+        console.log("PlayerLocal", this);
 
         const socket = io.connect("http://localhost:2002");
         socket.on('setId', data => { this.id = data.id; })
@@ -56,14 +58,28 @@ class PlayerLocal extends Player {
         }
     }
 
+    updateSocket(){
+		if (this.socket !== undefined){
+			this.socket.emit('update', {
+				x: this.object.position.x,
+				y: this.object.position.y,
+				z: this.object.position.z,
+				h: this.object.rotation.y,
+				pb: this.object.rotation.x,
+				action: this.action
+			})
+		}
+	}
+
+
     raycastSide(castDir, dir, pos, raycaster) {
         dir.set(castDir.x, castDir.y, castDir.z);
         dir.applyMatrix4(this.object.matrix);
         dir.normalize();
         raycaster = new THREE.Raycaster(pos, dir);
-        let intersects = raycaster.intersectObjects(this.core.colliders) 
-        if (intersects.length > 0 && intersect[0].distance < 50) {
-            this.object.translateX(100 - intersect[0].distance);
+        this.intersects = raycaster.intersectObjects(this.core.colliders) 
+        if (this.intersects.length > 0 && this.intersects[0].distance < 50) {
+            this.object.translateX(100 - this.intersects[0].distance);
         }
     }
 
@@ -73,9 +89,9 @@ class PlayerLocal extends Player {
         raycaster = new THREE.Raycaster(pos, dir);
         const gravity = 30;
 
-        let intersects = raycaster.intersectObjects(this.core.colliders);
-        if (intersects.length>0){
-            const targetY = pos.y - intersects[0].distance;
+        this.intersects = raycaster.intersectObjects(this.core.colliders);
+        if (this.intersects.length>0){
+            const targetY = pos.y - this.intersects[0].distance;
             if (targetY > this.object.position.y){
                 //Going up
                 this.object.position.y = 0.8 * this.object.position.y + 0.2 * targetY;
@@ -100,12 +116,12 @@ class PlayerLocal extends Player {
         this.object.getWorldDirection(dir);
         if (this.motion.forward < 0) dir.negate();
         let raycaster = new THREE.Raycaster(pos, dir);
-        let blackec = false;
+        let blocked = false;
         const colliders = this.core.colliders;
-        const intersects = raycaster.intersectObjects(colliders);
+        this.intersects = raycaster.intersectObjects(colliders);
 
         if(colliders !== undefined) {
-            if (intersects.length > 0 && intersects[0].distance < 50) blocked = true;
+            if (this.intersects.length > 0 && this.intersects[0].distance < 50) blocked = true;
         }
 
         if(!blocked) {
@@ -122,6 +138,7 @@ class PlayerLocal extends Player {
             const right = { x: 1, y: 0, z: 0 };
             this.raycastSide(left, dir, pos, raycaster);
             this.raycastSide(right, dir, pos, delta, raycaster)
+            this.raycastDown(dir, pos, delta, raycaster)
         }
 
         this.object.rotateY(this.motion.turn * delta);

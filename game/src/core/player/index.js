@@ -1,3 +1,6 @@
+import constants from '../../config/constants';
+import initialise from '../initialise';
+
 class Player {
     constructor(core, options) {
         this.local = true;
@@ -23,6 +26,7 @@ class Player {
         this.colour = colour;
         this.core = core;
         this.animations = this.core.animations;
+        this.object;
 
         this.init();
     }
@@ -30,13 +34,15 @@ class Player {
     init() {
         const loader = new THREE.FBXLoader();
         const textureLoader = new THREE.TextureLoader();
+        console.log("pre load")
         loader.load(`assets/3D/people/${this.model}.fbx`, object => {
+            console.log("load model")
             object.mixer = new THREE.AnimationMixer(object);
             this.root = object;
             this.mixer = object.mixer;
             object.name = "Person";
 
-            textureLoader.load(`assets/3D/imageas/SimplePeople_${this.model}_${this.colour}.png`, texture => {
+            textureLoader.load(`assets/3D/images/SimplePeople_${this.model}_${this.colour}.png`, texture => {
                 object.traverse(child => {
                     if(child.isMesh) {
                         child.castShadow = true;
@@ -47,11 +53,11 @@ class Player {
             });
 
             this.object = new THREE.Object3D();
-            this.player.object.add(object);
-            if(player.deleted === undefined) this.core.scene.add(this.object);
+            this.object.add(object);
+            if(this.deleted === undefined) this.core.scene.add(this.object);
 
             if (this.local) {
-                this.core.createCameras();
+                initialise.createCameras(this.core);
                 this.core.sun.target = this.core.player.object;
                 this.core.animations.Idle = object.animations[0];
                 if(this.initSocket !== undefined) this.initSocket();
@@ -69,8 +75,10 @@ class Player {
                 this.core.remotePlayers.push(players[0])
             }
 
-            if(core.animations.Idle !== undefined) this.action = "Idle";
-        });
+            if(this.core.animations.Idle !== undefined) this.action = "Idle";
+            // helpers.loadNextAnim(this.animations, this.loaders.fbx);
+
+        }, undefined, err => { console.log("FBXLoader Err", err)});
     }
 
     set action(name) {
@@ -79,10 +87,10 @@ class Player {
         if (this.local) clip = this.animations[name];
         /* Log the clip object and if it looks good, do a deep clone instead */
         else clip = THREE.AnimationClip.parse(THREE.AnimationClip.toJSON(this.animations[name]));
-
         const action = this.mixer.clipAction(clip);
         action.time = 0;
         this.mixer.stopAllAction();
+        // this.action = name;
         this.actionName = name;
         this.actionTime = Date.now();
 
