@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
 /* Initiate the app */
 app.use(express.static('../game/build/'));
@@ -42,23 +42,41 @@ io.sockets.on('connection', socket => {
         socket.userData.action  = data.action;
     });
 
+    socket.on('ready', data => {
+      socket.userData.isReady = data.isReady;
+      console.log(`user ${socket.id} is ready`);
+      checkIfAllAreReady();
+    })
+
     socket.on('chat message', data => {
         console.log(`chat message-${data.id}: ${data.message}`);
         io.to(data.id).emit('chat message', { id: socket.id, message: data.message });
     });
 });
 
-http.listen(2002,() => {
-    console.log("\x1b[32m$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\x1b[0m");
-    console.log("\x1b[32m$$$ Server Running on port 2002 $$$\x1b[0m");
-    console.log("\x1b[32m$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\x1b[0m")
-})
+  function checkIfAllAreReady() {
+    console.log("checking if all are ready")
+    const noOfConnectedUsers = Object.keys(io.sockets.sockets).length
+    console.log("number of connected users (I think)", noOfConnectedUsers)
+    /*
+    * io.sockets.sockets is an object containing each connected user
+    * Loop that shit and check if all are ready
+    */
+    let noOfReady = 0
+    // See if there is a noOfConnected paramater instead of a loop
+    for (let id in io.sockets.sockets) {
+      console.log(io.sockets.sockets[id].userData);
+      if (io.sockets.sockets[id].userData.isReady) noOfReady++;
+    }
+    console.log("ALL ARE READY?", noOfReady === noOfConnectedUsers)
+    // if ^this^ shit, emit the ready shit
+  }
 
 /**
- * This set interval will gather the data of all the connected sockets 
+ * This set interval will gather the data of all the connected sockets
  * and place them in an array whcih is sent to the client. It is set to do the every 40ms.
- * Ideally, you would find a way to only package up data relative to the user, ie, only 
- * package up socket activity that is occuring on the currently loaded tile. No need to 
+ * Ideally, you would find a way to only package up data relative to the user, ie, only
+ * package up socket activity that is occuring on the currently loaded tile. No need to
  * send the state of the entir game to the user when they can only see less than 1%
  */
 
@@ -83,6 +101,18 @@ setInterval(() => {
             });
         }
     }
-    // console.log("pack", pack)
     if(pack.length > 0) io.emit('remoteData', pack);
 }, 40);
+
+
+
+/**
+* Listen and accept connections through port 2002
+* This has to be done with the http server and i believe that is because
+* of socket.io
+*/
+server.listen(2002,() => {
+    console.log("\x1b[32m$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\x1b[0m");
+    console.log("\x1b[32m$$$ Server Running on port 2002 $$$\x1b[0m");
+    console.log("\x1b[32m$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\x1b[0m")
+})

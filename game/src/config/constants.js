@@ -1,5 +1,7 @@
 
-const constants = { 
+const constants = {
+
+    isReady: false,
 
     animationList: ["Walking", "Walking_Backward", "Turn", "Running"],
 
@@ -13,5 +15,3 @@ const constants = {
 };
 
 export default constants;
-
-

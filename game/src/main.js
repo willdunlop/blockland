@@ -8,10 +8,11 @@ import ReactDOM from 'react-dom';
 
 import App from './interface/app';
 
-// ReactDOM.render(<App />, document.getElementById('ui'));
 
-/** 
- * Probably dont have to append App to window. 
+/**
+ * Probably dont have to append App to window.
  * Can look at simply calling upon it if we don't want app information to be public
  * */
-window.app = new Core();
+const core = new Core();
+
+ReactDOM.render(<App core={core} />, document.getElementById('ui'));

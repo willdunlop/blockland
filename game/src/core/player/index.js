@@ -28,6 +28,7 @@ class Player {
         this.core = core;
         this.animations = this.core.animations;
         this.object;
+        this.isReady = false;
 
         this.init();
     }
