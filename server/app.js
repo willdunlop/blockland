@@ -62,10 +62,15 @@ io.sockets.on('connection', socket => {
     * io.sockets.sockets is an object containing each connected user
     * Loop that shit and check if all are ready
     */
+
+    /*
+    * this could be set outside the function and incremented on each
+    * time the function is called, rather than resetting and running a
+    * a loop each time
+    */
     let noOfReady = 0
     // See if there is a noOfConnected paramater instead of a loop
     for (let id in io.sockets.sockets) {
-      console.log(io.sockets.sockets[id].userData);
       if (io.sockets.sockets[id].userData.isReady) noOfReady++;
     }
     console.log("ALL ARE READY?", noOfReady === noOfConnectedUsers)
