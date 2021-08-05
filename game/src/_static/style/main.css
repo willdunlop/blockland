@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css?family=Ubuntu");
 html {
   box-sizing: border-box; }
 
@@ -257,12 +256,6 @@ video {
 @viewport {
   width: device-width; }
 
-@font-face {
-  font-family: Ubuntu;
-  font-style: normal;
-  font-weight: 400;
-  src: url("https://fonts.googleapis.com/css?family=Ubuntu"); }
-
 html {
   color: #ffffff;
   font-family: 'Ubuntu', sans-serif;
@@ -270,11 +263,11 @@ html {
   line-height: 1.375;
   background: #ffdddd;
   /* Old browsers */
-  background: -moz-linear-gradient(top, #ffdddd 0%, #8200c9 100%);
+  background: -moz-linear-gradient(top, #d4e4f1 0%, #8200c9 100%);
   /* FF3.6-15 */
-  background: -webkit-linear-gradient(top, #ffdddd 0%, #8200c9 100%);
+  background: -webkit-linear-gradient(top, #d4e4f1 0%, #8200c9 100%);
   /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to bottom, #ffdddd 0%, #8200c9 100%);
+  background: linear-gradient(to bottom, #d4e4f1 0%, #8200c9 100%);
   /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */ }
   html {
     font-size: 14px; }
@@ -310,9 +303,23 @@ body {
     .container {
       width: 93.75%; } }
 
-.app__isReady {
+.app__form {
   position: absolute;
   bottom: 0;
+  color: black; }
+
+.hidden {
+  display: none; }
+
+.options {
+  position: absolute;
+  top: 50%;
+  left: 60%;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 5px; }
+
+.options-submit {
+  margin: 0 auto;
   color: black; }
 
 .container::after,

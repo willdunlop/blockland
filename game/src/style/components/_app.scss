@@ -2,8 +2,25 @@
 
 }
 
-.app__isReady {
+.app__form {
   position: absolute;
   bottom: 0;
   color: black;
+}
+
+.hidden {
+  display: none;
+}
+
+.options {
+  position: absolute;
+  top: 50%;
+  left: 60%;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 5px;
+}
+
+.options-submit {
+  margin: 0 auto;
+  color: black
 }

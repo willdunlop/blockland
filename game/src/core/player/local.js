@@ -1,20 +1,24 @@
+import * as THREE from "three"
+
 import io from 'socket.io-client';
 import Player from './index';
 
 import constants from '../../config/constants'
 
 class PlayerLocal extends Player {
-  constructor(core, model) {
-    super(core, model);
+  constructor(core, socket) {
+    super(core);
 
-    const socket = io.connect("http://localhost:2002");
-    socket.on('setId', data => {
+    console.log("socket", socket)
+    this.socket = socket;
+
+    this.socket.on('setId', data => {
       this.id = data.id;
     })
-    socket.on('remoteData', data => {
+    this.socket.on('remoteData', data => {
       core.remoteData = data;
     })
-    socket.on('deletePlayer', data => {
+    this.socket.on('deletePlayer', data => {
       const players = core.remotePlayers.filter(player => {
         if (player.id === data.id)
           return player;
@@ -38,18 +42,36 @@ class PlayerLocal extends Player {
     });
 
     // socket.on('chat message', data => {
-    //     const remotePlayer = core.getRemotePlayerById(data.id);
-    //     core.speechBubble.player = remotePlayer;
-    //     core.chatSocketId = remotePlayer.id
-    //     core.activeCamera = core.cameras.chat;
-    //     core.speechBubble.update(data.message);
+    //   if (this.id === data.id) {
+    //     console.log("ids matched")
+    //   }
+        // const remotePlayer = core.getRemotePlayerById(data.id);
+        // core.speechBubble.player = remotePlayer;
+        // core.chatSocketId = remotePlayer.id
+        // core.activeCamera = core.cameras.chat;
+        // core.speechBubble.update(data.message);
     // })
 
     /**
-         * Message form submition and resetting
-         */
+     * Message form submition and resetting
+     */
+    window.addEventListener("give.sausageSizzle", this.giveSausageSizzle.bind(this))
 
-    this.socket = socket;
+  }
+  
+  giveSausageSizzle() {
+    this.object.children[0]             //  chef_NPCS
+    .children[1]                    //  pelvis
+    .children[2]                    // spine_01    
+    .children[0]                    // spine_02
+    .children[0]                    //  spine_03
+    .children[0]                    // clavicle_r
+    .children[0]                    // upperarm r
+    .children[0]                    // lowerarm r
+    .children[0]                    // hand r
+    .children[0].visible = true;
+
+    console.log("giving the saus", this.object)
   }
 
   initSocket() {

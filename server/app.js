@@ -34,6 +34,7 @@ io.sockets.on('connection', socket => {
     });
     /* Update socket with new data */
     socket.on('update', data => {
+        console.log("Position", data.x, data.z)
         socket.userData.x = data.x
         socket.userData.y = data.y;
         socket.userData.z = data.z;
@@ -46,18 +47,52 @@ io.sockets.on('connection', socket => {
       socket.userData.isReady = data.isReady;
       console.log(`user ${socket.id} is ready`);
       checkIfAllAreReady();
+    });
+
+    socket.on('npc-click', data => {
+        console.log("chat was requested for", data.npcName);
+        switch (data.npcName) {
+            case "server-NPC": return socket.emit("NPC.response", {
+                name: "server-NPC",
+                message: ["Hi there and welcome to Bunnings!", "What would you like on your Bunnings ™ Sausage Sizzle ©"],
+                endEvent: { name: "revealOptions", data: true }
+            });
+
+            case "chef-NPC":
+                const message = ["Hi", "Hey there", "Hello", "I'm the chef!"]
+                return socket.emit("NPC.response", {
+                name: "chef-NPC",
+                message: message[Math.floor(Math.random() * (3 - 0 + 1)) + 0]
+            });
+        }
     })
 
     socket.on('chat message', data => {
         console.log(`chat message-${data.id}: ${data.message}`);
-        io.to(data.id).emit('chat message', { id: socket.id, message: data.message });
+        socket.broadcast.emit('chat message', { name: socket.id, message: data.message });
     });
+
+    socket.on("submit options", data => {
+        const response = ["Alrighty! First is the sausage"];
+        data.options.forEach((option, i) => {
+            if (i === 0) response.push(`Then we have ${option}`);
+            else if (i === 1) response.push(`And then ${option}`)
+            else if(i===2) response.push(`As well as ${option}`);
+        });
+        response.push("And there we have it! Your sausage sizzle is ready")
+        socket.emit("NPC.response", {
+            name: "chef-NPC",
+            message: response,
+            player: data.playerId,
+            endEvent: { name: "giveSausageSizzle", data: "" }
+        })
+    })
 });
 
   function checkIfAllAreReady() {
     console.log("checking if all are ready")
     const noOfConnectedUsers = Object.keys(io.sockets.sockets).length
-    console.log("number of connected users (I think)", noOfConnectedUsers)
+    console.log("number of connected users", noOfConnectedUsers)
     /*
     * io.sockets.sockets is an object containing each connected user
     * Loop that shit and check if all are ready
